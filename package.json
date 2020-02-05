@@ -1,0 +1,27 @@
+{
+  "name": "rubik-file",
+  "version": "1.0.0",
+  "description": "File storage Kubik for Rubik's applications",
+  "main": "classes/File.js",
+  "repository": "git@github.com:ya-kostik/rubik-file.git",
+  "author": "Constantin Tsukanov <c@indotech.ru>",
+  "license": "Apache-2.0",
+  "private": false,
+  "scripts": {
+    "test": "jest --verbose ./",
+    "watch": "jest --verbose --watch ./",
+    "lint": "eslint ./"
+  },
+  "peerDependencies": {
+    "rubik-main": "^2.2.0"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.0.3",
+    "bl": "^4.0.0",
+    "eslint": "^6.8.0",
+    "eslint-plugin-security": "^1.4.0",
+    "jest": "^25.1.0",
+    "lodash": "^4.17.15",
+    "rubik-main": "^2.2.0"
+  }
+}
