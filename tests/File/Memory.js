@@ -11,11 +11,12 @@ class Memory extends Provider {
   }
 
   async write(source, stream) {
-    const buffer = new BufferListStream();
-    stream.pipe(buffer);
-    this.files.set(this.getPath(source), buffer);
+    const bufferList = new BufferListStream();
+    stream.pipe(bufferList);
 
     await waitForStream(stream);
+
+    this.files.set(this.getPath(source), bufferList.slice());
   }
 
   async has(source) {
@@ -23,7 +24,9 @@ class Memory extends Provider {
   }
 
   async read(source) {
-    return this.files.get(this.getPath(source)) || null;
+    const buffer = this.files.get(this.getPath(source));
+    if (!buffer) return null;
+    return new BufferListStream([buffer]);
   }
 
   async remove(source) {

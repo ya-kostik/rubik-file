@@ -1,20 +1,13 @@
-/* global jest describe test expect */
-
-
-const createRandomStream = require('./lib/createRandomStream');
+/* global describe test expect */
 const Memory = require('./File/Memory');
 const doAfterUp = require('./File/doAfterUp');
-const createBufferList = require('./lib/createBufferList');
+const prepareP2P = require('./File/prepareP2P');
+const write = require('./File/write');
+const testCopyOrMove = require('./File/testCopyOrMove');
+const checkFileIntersection = require('./File/checkFileIntersection');
+const readBuffer = require('./lib/readBuffer');
 
 const DEFAULT_NAME = 'file';
-
-async function write(file, bucket) {
-  const stream = createRandomStream();
-  const buffer = stream.slice();
-  const id = 'test.png';
-  await file.write({ id, bucket }, stream);
-  return { id, bucket, file, stream, buffer };
-}
 
 describe('File Kubik', () => {
   test('created and upped with default name', async () => {
@@ -28,6 +21,7 @@ describe('File Kubik', () => {
   test('writes file', async () => {
     await doAfterUp(async (file) => {
       const { id } = await write(file);
+
       expect(await file.has({ id })).toBe(true);
     });
   });
@@ -35,8 +29,7 @@ describe('File Kubik', () => {
   test('reads file', async () => {
     await doAfterUp(async (file) => {
       const { id, buffer: bufferIn } = await write(file);
-      const streamOut = await file.read({ id });
-      const bufferOut = (await createBufferList(streamOut)).slice();
+      const bufferOut = await readBuffer(await file.read({ id }));
 
       expect(bufferIn).toEqual(bufferOut);
     });
@@ -50,5 +43,48 @@ describe('File Kubik', () => {
     });
   });
 
-  test('copy file', () => {});
+  test('copy file', async () => {
+    await doAfterUp(async (file) => {
+      await testCopyOrMove('copy', file);
+    });
+  });
+
+  test('move file', async () => {
+    await doAfterUp(async (file) => {
+      await testCopyOrMove('move', file);
+    });
+  });
+
+  test('copy from one provider to other', async () => {
+    await doAfterUp(async (file) => {
+      const { from, to, buffer } = await prepareP2P(file);
+
+      await file.copy(from, to);
+
+      const bufferFrom = await readBuffer(await file.read(from));
+      const bufferTo = await readBuffer(await file.read(to));
+
+      expect(bufferFrom).toEqual(buffer);
+      expect(bufferTo).toEqual(buffer);
+
+      await checkFileIntersection(file, from, to);
+    });
+  });
+
+  test('move from one provider to other', async () => {
+    await doAfterUp(async (file) => {
+      const { from, to, buffer } = await prepareP2P(file);
+
+      await file.move(from, to);
+
+      const bufferTo = await readBuffer(await file.read(to));
+
+      expect(await file.has(from)).toBe(false);
+      expect(await file.has(to)).toBe(true);
+
+      expect(bufferTo).toEqual(buffer);
+
+      await checkFileIntersection(file, from, to);
+    });
+  });
 });
