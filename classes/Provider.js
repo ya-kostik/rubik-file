@@ -1,7 +1,13 @@
 const FileError = require('./FileError');
 
-function defaultMethod() {
-  throw new FileError(FileError.METHOD_IS_NOT_IMPLEMENTED);
+const REQUIRED_METHODS = Object.freeze([
+  'write', 'has', 'read', 'remove'
+]);
+
+async function defaultMethod() {
+  throw new FileError(
+    FileError.METHOD_IS_NOT_IMPLEMENTED + REQUIRED_METHODS.join(', ')
+  );
 }
 
 class Provider {
@@ -11,9 +17,9 @@ class Provider {
 }
 
 // Abstract
-const methods = ['write', 'has', 'read', 'remove'];
-for (const method of methods) {
+for (const method of REQUIRED_METHODS) {
   Provider.prototype[method] = defaultMethod;
 }
 
+Provider.REQUIRED_METHODS = REQUIRED_METHODS;
 module.exports = Provider;

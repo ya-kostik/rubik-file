@@ -1,6 +1,8 @@
 const isString = require('lodash/isString');
 const { Kubik } = require('rubik-main');
 
+const isBucket = require('../lib/isBucket');
+
 const FileError = require('./FileError');
 const Provider = require('./Provider');
 
@@ -64,7 +66,7 @@ class File extends Kubik {
   _getBucket(bucket) {
     bucket = bucket || this.options.bucket;
     FileError.is(
-      bucket && isString(bucket),
+      isBucket(bucket),
       FileError.INVALID_BUCKET
     );
     return bucket;
