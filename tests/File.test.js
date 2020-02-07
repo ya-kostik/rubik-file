@@ -20,16 +20,16 @@ describe('File Kubik', () => {
 
   test('writes file', async () => {
     await doAfterUp(async (file) => {
-      const { id } = await write(file);
+      const { key } = await write(file);
 
-      expect(await file.has({ id })).toBe(true);
+      expect(await file.has({ key })).toBe(true);
     });
   });
 
   test('reads file', async () => {
     await doAfterUp(async (file) => {
-      const { id, buffer: bufferIn } = await write(file);
-      const bufferOut = await readBuffer(await file.read({ id }));
+      const { key, buffer: bufferIn } = await write(file);
+      const bufferOut = await readBuffer(await file.read({ key }));
 
       expect(bufferIn).toEqual(bufferOut);
     });
@@ -37,9 +37,9 @@ describe('File Kubik', () => {
 
   test('removes file', async () => {
     await doAfterUp(async (file) => {
-      const { id } = await write(file);
-      await file.remove({ id });
-      expect(await file.has({ id })).toBe(false);
+      const { key } = await write(file);
+      await file.remove({ key });
+      expect(await file.has({ key })).toBe(false);
     });
   });
 

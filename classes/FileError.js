@@ -1,4 +1,4 @@
-const INVALID_ID = 'id is not a string or invalid';
+const INVALID_KEY = 'key is not a string or invalid';
 const INVALID_BUCKET = 'name of bucket is not a string or invalid';
 const INVALID_PROVIDER = 'provider should be an instance of Provider';
 const INVALID_PROVIDER_CLASS = 'unknown provider';
@@ -15,7 +15,7 @@ class FileError extends Error {
 Object.assign(
   FileError,
   {
-    INVALID_ID,
+    INVALID_KEY,
     INVALID_BUCKET,
     INVALID_PROVIDER,
     INVALID_PROVIDER_CLASS,

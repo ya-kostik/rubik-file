@@ -11,8 +11,8 @@ async function defaultMethod() {
 }
 
 class Provider {
-  getPath({ id, bucket }) {
-    return `${bucket}/${id}`;
+  getPath({ key, bucket }) {
+    return `${bucket}/${key}`;
   }
 }
 

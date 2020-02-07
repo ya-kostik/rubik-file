@@ -1,7 +1,7 @@
-const isString = require('lodash/isString');
 const { Kubik } = require('rubik-main');
 
 const isBucket = require('../lib/isBucket');
+const isKey = require('../lib/isKey');
 
 const FileError = require('./FileError');
 const Provider = require('./Provider');
@@ -72,32 +72,32 @@ class File extends Kubik {
     return bucket;
   }
 
-  isIdValid(id) {
+  isKeyValid(key) {
     FileError.is(
-      id && isString(id),
-      FileError.INVALID_ID
+      isKey(key),
+      FileError.INVALID_KEY
     );
   }
 
   _parseSource(source) {
-    let { id, bucket, provider } = source;
-    this.isIdValid(id);
+    let { key, bucket, provider } = source;
+    this.isKeyValid(key);
     bucket = this._getBucket(bucket);
     provider = this._getProvider(provider);
 
-    return { id, bucket, provider };
+    return { key, bucket, provider };
   }
 
-  _minifySource({ id, bucket  }) {
-    return { id, bucket };
+  _minifySource({ key, bucket  }) {
+    return { key, bucket };
   }
 
   async _call(method, hooks, source, ...args) {
     const parsedSource = this._parseSource(source);
-    const { id, bucket, provider } = parsedSource;
+    const { key, bucket, provider } = parsedSource;
 
     hooks && await this.processHooksAsync(`before-${method}`, parsedSource, ...args);
-    const result = await provider[method]({ id, bucket }, ...args);
+    const result = await provider[method]({ key, bucket }, ...args);
     hooks && await this.processHooksAsync(`after-${method}`, parsedSource, result);
 
     return result;

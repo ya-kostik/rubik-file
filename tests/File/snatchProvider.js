@@ -1,3 +1,3 @@
 module.exports = function snatchProvider(from, to) {
-  return { id: from.id, provider: to.provider };
+  return { key: from.key, provider: to.provider };
 };
