@@ -2,6 +2,7 @@ const { Kubik } = require('rubik-main');
 
 const isBucket = require('../lib/isBucket');
 const isKey = require('../lib/isKey');
+const isKeySafe = require('../lib/isKeySafe');
 
 const FileError = require('./FileError');
 const Provider = require('./Provider');
@@ -74,7 +75,9 @@ class File extends Kubik {
 
   isKeyValid(key) {
     FileError.is(
-      isKey(key),
+      this.options.strict
+        ? isKeySafe(key)
+        : isKey(key),
       FileError.INVALID_KEY
     );
   }
@@ -167,5 +170,7 @@ class File extends Kubik {
   }
 }
 
+File.isKeySafe = isKeySafe;
+File.prototype.isKeySafe = isKeySafe;
 File.prototype.dependencies = Object.freeze(['config']);
 module.exports = File;

@@ -1,4 +1,5 @@
 module.exports = {
   provider: '',
-  bucket: 'main'
+  bucket: 'main',
+  strict: true
 };
