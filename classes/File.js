@@ -62,10 +62,25 @@ class File extends Kubik {
     return new Provider(options);
   }
 
-  constructor() {
-    super(...arguments);
+  constructor(options) {
+    super();
     this.provider = null;
     this.options = {};
+    this._updateOptions(options);
+  }
+
+  _updateOptions(options = {}) {
+    Object.assign(this.options, options);
+  }
+
+  addProvider(name, Constructor, isDefault = false) {
+    this.constructor.addProvider(name, Constructor);
+    if (!isDefault) return;
+    this.options.provider = name;
+  }
+
+  createProvider(name, options) {
+    return this.constructor.createProvider(name, options);
   }
 
   _initProvider(name) {
@@ -85,7 +100,7 @@ class File extends Kubik {
    */
   async up({ config }) {
     Object.assign(this, { config });
-    this.options = this.config.get(this.name);
+    this._updateOptions(this.config.get(this.name));
 
     this._initProvider(this.options.provider);
   }
