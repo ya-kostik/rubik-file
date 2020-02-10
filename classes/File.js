@@ -8,10 +8,25 @@ const FileError = require('./FileError');
 const Provider = require('./Provider');
 
 /**
- * Filestorage for Rubik
+ * Source of a file
+ * @typedef {Object} Source
+ * @prop {String} key — is a key of the file in the storage
+ * @prop {String} bucket — is a bucket's name of the file in the storage
+ * @prop {Provider} [provider] — is an optional provider of storage
+ */
+
+
+/**
+ * Filestorage Kubik for Rubik
+ * @prop {Object} options — is options of kubik
+ * @prop {Provider} [provider] — is a Provider's instance
  */
 class File extends Kubik {
-
+  /**
+   * Add provider
+   * @param {String} name — is a name of provider, for example FS
+   * @param {Provider} Provider — is a Provider's Constructor
+   */
   static addProvider(name, Provider) {
     if (!this._providers) {
       this._providers = Object.create(null);
@@ -19,16 +34,30 @@ class File extends Kubik {
     this._providers[name] = Provider;
   }
 
+  /**
+   * Get Povider Constructor
+   * @param  {String} name — is a name of Provider's existing Constructor
+   * @return {Function} is a Provider's Constructor
+   * @throws {FileError} when Provider's Constructor not found or invalid
+   */
   static getProvider(name) {
-    const Provider = this._providers && this._providers[name];
+    const Constructor = this._providers && this._providers[name];
     FileError.is(
-      Provider,
+      Object.prototype.isPrototypeOf.call(
+        Provider, Constructor
+      ),
       FileError.INVALID_PROVIDER_CLASS
     );
-    return Provider;
+    return Constructor;
   }
 
-  static createProvider(name, options) {
+  /**
+   * Create Provider's instance by name
+   * @param  {String} name — is a name of Provider's Constructor
+   * @param  {Object} [options={}] — is an instance options
+   * @return {Provider} is an instance of Provider
+   */
+  static createProvider(name, options = {}) {
     const Provider = this.getProvider(name);
     return new Provider(options);
   }
@@ -48,6 +77,12 @@ class File extends Kubik {
     );
   }
 
+  /**
+   * Up Kubik
+   * @param  {Object} dependencies
+   * @param  {Rubik.Config} dependencies.config
+   * @return {Promise}
+   */
   async up({ config }) {
     Object.assign(this, { config });
     this.options = this.config.get(this.name);
@@ -73,7 +108,7 @@ class File extends Kubik {
     return bucket;
   }
 
-  isKeyValid(key) {
+  _validateKey(key) {
     FileError.is(
       this.options.strict
         ? isKeySafe(key)
@@ -84,7 +119,7 @@ class File extends Kubik {
 
   _parseSource(source) {
     let { key, bucket, provider } = source;
-    this.isKeyValid(key);
+    this._validateKey(key);
     bucket = this._getBucket(bucket);
     provider = this._getProvider(provider);
 
@@ -110,10 +145,21 @@ class File extends Kubik {
     return this._call('write', hooks, to, stream);
   }
 
+  /**
+   * Write stream to storage
+   * @param  {Source} to — is a destination of file
+   * @param  {ReadableStream} stream — readable stream to write
+   * @return {Promise}
+   */
   async write(to, stream) {
     return this._write(to, stream, true)
   }
 
+  /**
+   * Check file exists
+   * @param  {Source}  source — is a location of file
+   * @return {Promise<Boolean>}
+   */
   async has(source) {
     return this._call('has', true, source);
   }
@@ -124,6 +170,11 @@ class File extends Kubik {
     return this._call('read', hooks, from);
   }
 
+  /**
+   * Read file
+   * @param  {Source} from — is a location of file
+   * @return {Promise<ReadableStream>}
+   */
   async read(from) {
     return this._read(from, true)
   }
@@ -132,6 +183,11 @@ class File extends Kubik {
     return this._call('remove', hooks, source);
   }
 
+  /**
+   * Remove file
+   * @param  {Source} source — is a location of file
+   * @return {Promise}
+   */
   async remove(source) {
     return this._remove(source, true);
   }
@@ -155,10 +211,22 @@ class File extends Kubik {
     hooks && await this.processHooksAsync('after-copy', parsedFrom, parsedTo);
   }
 
+  /**
+   * Copy file
+   * @param  {Source} from — is a location of file
+   * @param  {Source} to — is a destination of file
+   * @return {Promise}
+   */
   async copy(from, to) {
     return this._copy(from, to, true);
   }
 
+  /**
+   * Move file
+   * @param  {Source} from — is a location of file
+   * @param  {Source} to — is a destination of file
+   * @return {Promise}
+   */
   async move(from, to) {
     const parsedFrom = this._parseSource(from);
     const parsedTo = this._parseSource(to);
@@ -171,6 +239,8 @@ class File extends Kubik {
 }
 
 File.isKeySafe = isKeySafe;
+File.isKeyValid = isKey;
 File.prototype.isKeySafe = isKeySafe;
+File.prototype.isKeyValid = isKey;
 File.prototype.dependencies = Object.freeze(['config']);
 module.exports = File;

@@ -10,6 +10,13 @@ async function defaultMethod() {
   );
 }
 
+/**
+ * Abstract Provider
+ *
+ * Providers are needed to separate storage logic from kubik's code
+ * Also providers should be used for copy or move files from one storage to another
+ * @class Provider
+ */
 class Provider {
   getPath({ key, bucket }) {
     return `${bucket}/${key}`;

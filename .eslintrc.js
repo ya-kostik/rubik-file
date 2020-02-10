@@ -9,7 +9,6 @@ module.exports = {
   rules: {
     'no-console': ['error', { 'allow': ['error', 'info'] }],
     'security/detect-object-injection': [0],
-    'security/detect-non-literal-fs-filename': [0]
   },
   globals: {}
 }

@@ -1,6 +1,6 @@
 {
   "name": "rubik-file",
-  "version": "1.0.0",
+  "version": "1.0.0-beta.1",
   "description": "File storage Kubik for Rubik's applications",
   "main": "classes/File.js",
   "repository": "git@github.com:ya-kostik/rubik-file.git",
