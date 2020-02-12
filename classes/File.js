@@ -257,5 +257,10 @@ File.isKeySafe = isKeySafe;
 File.isKeyValid = isKey;
 File.prototype.isKeySafe = isKeySafe;
 File.prototype.isKeyValid = isKey;
+
 File.prototype.dependencies = Object.freeze(['config']);
+
+File.Provider = Provider;
+File.FileError = FileError;
+
 module.exports = File;
