@@ -18,6 +18,10 @@ async function defaultMethod() {
  * @class Provider
  */
 class Provider {
+  constructor(options = {}) {
+    this.options = Object.assign({}, options);
+  }
+
   getPath({ key, bucket }) {
     return `${bucket}/${key}`;
   }

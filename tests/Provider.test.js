@@ -17,4 +17,13 @@ describe('Provider class', () => {
       );
     }
   );
+
+  test('saves options', () => {
+    const options = { a: 1, b: 2 };
+    const provider = new TestProvider(options);
+    // equal
+    expect(provider.options).toEqual(options);
+    // but not exactly the same
+    expect(provider.options).not.toBe(options);
+  });
 });

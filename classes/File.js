@@ -1,5 +1,6 @@
 const { Kubik } = require('rubik-main');
 
+const isProvider = require('../lib/isProvider');
 const isBucket = require('../lib/isBucket');
 const isKey = require('../lib/isKey');
 const isKeySafe = require('../lib/isKeySafe');
@@ -31,6 +32,7 @@ class File extends Kubik {
     if (!this._providers) {
       this._providers = Object.create(null);
     }
+    this._checkProvider(Provider);
     this._providers[name] = Provider;
   }
 
@@ -41,14 +43,8 @@ class File extends Kubik {
    * @throws {FileError} when Provider's Constructor not found or invalid
    */
   static getProvider(name) {
-    const Constructor = this._providers && this._providers[name];
-    FileError.is(
-      Object.prototype.isPrototypeOf.call(
-        Provider, Constructor
-      ),
-      FileError.INVALID_PROVIDER_CLASS
-    );
-    return Constructor;
+    const Provider = this._providers && this._providers[name];
+    return Provider || null;
   }
 
   /**
@@ -59,7 +55,15 @@ class File extends Kubik {
    */
   static createProvider(name, options = {}) {
     const Provider = this.getProvider(name);
+    this._checkProvider(Provider);
     return new Provider(options);
+  }
+
+  static _checkProvider(Provider) {
+    FileError.is(
+      isProvider(Provider),
+      FileError.INVALID_PROVIDER_CLASS
+    );
   }
 
   constructor(options) {
@@ -73,8 +77,14 @@ class File extends Kubik {
     Object.assign(this.options, options);
   }
 
-  addProvider(name, Constructor, isDefault = false) {
-    this.constructor.addProvider(name, Constructor);
+  /**
+   * Add provide
+   * @param {[type]}  name      [description]
+   * @param {[type]}  Provider  [description]
+   * @param {Boolean} isDefault [description]
+   */
+  addProvider(name, Provider, isDefault = false) {
+    this.constructor.addProvider(name, Provider);
     if (!isDefault) return;
     this.options.provider = name;
   }
@@ -253,8 +263,10 @@ class File extends Kubik {
   }
 }
 
+File.isProvider = isProvider;
 File.isKeySafe = isKeySafe;
 File.isKeyValid = isKey;
+File.prototype.isProvider = isProvider;
 File.prototype.isKeySafe = isKeySafe;
 File.prototype.isKeyValid = isKey;
 
