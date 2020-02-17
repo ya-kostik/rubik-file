@@ -266,9 +266,11 @@ class File extends Kubik {
 File.isProvider = isProvider;
 File.isKeySafe = isKeySafe;
 File.isKeyValid = isKey;
+File.isBucket = isBucket;
 File.prototype.isProvider = isProvider;
 File.prototype.isKeySafe = isKeySafe;
 File.prototype.isKeyValid = isKey;
+File.prototype.isBucket = isBucket;
 
 File.prototype.dependencies = Object.freeze(['config']);
 
